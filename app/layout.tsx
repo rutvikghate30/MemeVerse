@@ -14,7 +14,8 @@ import { MemeProvider } from "./upload/MemeContext"
 import { Github, Twitter, Instagram, Heart } from 'lucide-react';
 import { FiTrendingUp, FiMenu, FiX } from "react-icons/fi";
 import { FaHome, FaSearch, FaUpload, FaUser, FaTrophy } from "react-icons/fa";
-
+import {metadata} from "./metadata"
+import Head from "next/head"
 const navItems = [
   { href: "/", label: "Home", icon: <FaHome /> },
   { href: "/explore", label: "Explore", icon: <FaSearch /> },
@@ -45,6 +46,11 @@ export default function RootLayout({
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <html lang="en" className={darkMode ? "dark" : ""}>
+      <Head>
+      <title>{metadata.title}</title>
+        <meta name="description" content={metadata.description} />
+        <meta name="keywords" content={metadata.keywords.join(", ")} />
+      </Head>
       <body
         className={`${inter.className} bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col`}
       >

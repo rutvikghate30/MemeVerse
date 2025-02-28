@@ -10,7 +10,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import axios from "axios";
 
 const IMGBB_API_URL = "https://api.imgbb.com/1";
-const IMGBB_API_KEY = "92df20183b6f17601296d99082ebe255"; // Ensure this is kept in an env variable in production
+// const IMGBB_API_KEY = "92df20183b6f17601296d99082ebe255";
 
 export const uploadImage = async (imageFile: File): Promise<string> => {
   try {
@@ -18,7 +18,7 @@ export const uploadImage = async (imageFile: File): Promise<string> => {
     formData.append("image", imageFile);
 
     const response = await axios.post(
-      `${IMGBB_API_URL}/upload?key=${IMGBB_API_KEY}`,
+      `${IMGBB_API_URL}/upload?key=${process.env.NEXT_PUBLIC_IMGBB_API_KEY}`,
       formData
     );
 
