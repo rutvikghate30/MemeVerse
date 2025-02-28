@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import haha from "./assets/haha.png";
-import monkey from "./assets/monkey.png";
 
 export default function Home() {
   const dispatch = useDispatch<AppDispatch>();
