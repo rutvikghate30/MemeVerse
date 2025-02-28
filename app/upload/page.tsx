@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useDropzone } from "react-dropzone";
-import { Upload, Image, Sparkles, X, Check } from "lucide-react";
+import { Upload, Image, Sparkles, X, Check, Wand2, Type, Layout, Palette } from "lucide-react";
 import { useMeme } from "./MemeContext";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import axios from "axios";
@@ -54,6 +54,20 @@ export const generateMemeCaption = async (memeTitle: string): Promise<string> =>
   });
 };
 
+const createMeme = async (imageUrl: string, topText: string, bottomText: string): Promise<string> => {
+  try {
+    const response = await axios.post('https://api.memegen.link/images/custom', {
+      background: imageUrl,
+      text_top: topText,
+      text_bottom: bottomText,
+    });
+    return response.data.url;
+  } catch (error) {
+    console.error("Error creating meme:", error);
+    throw error;
+  }
+};
+
 const UploadPage: React.FC = () => {
   const router = useRouter();
   const { uploadMeme } = useMeme();
@@ -67,6 +81,9 @@ const UploadPage: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [topText, setTopText] = useState("");
+  const [bottomText, setBottomText] = useState("");
+  const [isMemeMode, setIsMemeMode] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const selectedFile = acceptedFiles[0];
@@ -115,38 +132,38 @@ const UploadPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          const newProgress = prev + 10;
-          return newProgress > 90 ? 90 : newProgress;
-        });
-      }, 300);
-
-      // Upload image (simulated)
+      // Upload image first
       const imageUrl = await uploadImage(file);
-      clearInterval(progressInterval);
-      setUploadProgress(100);
 
-      // Call context function to add new meme
-      uploadMeme({
+      // If in meme mode, create meme using the uploaded image
+      const finalImageUrl = isMemeMode ? 
+        await createMeme(imageUrl, topText, bottomText) : 
+        imageUrl;
+
+      // Create meme object
+      const newMeme = {
+        id: Date.now().toString(), // Generate unique ID
         title,
-        url: imageUrl,
-        width: 500, // Placeholder values
+        url: finalImageUrl,
+        width: 500,
         height: 500,
         captions: caption ? 1 : 0,
         category: "user-uploaded",
-      });
+      };
+
+      // Call context function to add new meme
+      uploadMeme(newMeme);
+
+      // Store in localStorage
+      const existingMemes = JSON.parse(localStorage.getItem('userMemes') || '[]');
+      localStorage.setItem('userMemes', JSON.stringify([...existingMemes, newMeme]));
 
       setSuccess(true);
-
-      // Redirect to ProfilePage after a short delay
       setTimeout(() => {
         router.push("/profile");
       }, 2000);
     } catch (err) {
       setError("Failed to upload meme. Please try again.");
-      setUploadProgress(0);
     } finally {
       setLoading(false);
     }
@@ -290,6 +307,65 @@ const UploadPage: React.FC = () => {
                   className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 />
               </div>
+
+              {/* Add Toggle for Meme Creation Mode */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center space-x-2 mb-4"
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsMemeMode(!isMemeMode)}
+                  className={`flex items-center px-4 py-2 rounded-md transition-all ${
+                    isMemeMode 
+                      ? "bg-yellow-600 text-white" 
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  <Wand2 size={16} className="mr-2" />
+                  Meme Creator Mode
+                </button>
+              </motion.div>
+
+              <AnimatePresence>
+                {isMemeMode && previewUrl && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <Type size={16} className="mr-2" />
+                        Top Text
+                      </label>
+                      <input
+                        type="text"
+                        value={topText}
+                        onChange={(e) => setTopText(e.target.value)}
+                        className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-yellow-500"
+                        placeholder="Enter top text"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <Layout size={16} className="mr-2" />
+                        Bottom Text
+                      </label>
+                      <input
+                        type="text"
+                        value={bottomText}
+                        onChange={(e) => setBottomText(e.target.value)}
+                        className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-yellow-500"
+                        placeholder="Enter bottom text"
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Error Message */}
               {error && <div className="text-red-500 dark:text-red-400 text-sm">{error}</div>}

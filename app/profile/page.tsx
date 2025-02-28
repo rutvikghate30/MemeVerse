@@ -58,129 +58,162 @@ const ProfilePage: React.FC = () => {
 
   
   return (
-    
     <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }} className="container mx-auto px-4 py-8 white bg-white dark:bg-gray-900">
-      {/* Title */}
-      <h1 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-yellow-600 to-orange-400 text-transparent bg-clip-text text-center">
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800"
+    >
+      {/* Enhanced Title with animation */}
+      <motion.h1
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="text-4xl md:text-5xl font-bold mb-8 bg-gradient-to-r from-yellow-500 to-orange-500 text-transparent bg-clip-text text-center"
+      >
         User Profile
-      </h1>
+      </motion.h1>
 
-      {/* Layout: Two columns on md screens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Edit Profile Section */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
-          <form onSubmit={handleProfileUpdate} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Enhanced Edit Profile Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg"
+        >
+          <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Edit Profile</h2>
+          
+          {/* Profile Picture Section */}
+          <div className="mb-6 flex flex-col items-center">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative w-40 h-40 mb-4"
+            >
+              <div className="w-40 h-40 rounded-full border-4 border-orange-500 overflow-hidden">
+                <img
+                  src={profileInfo.profilePicture || "/default-avatar.png"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <label
+                htmlFor="profile-upload"
+                className="absolute bottom-0 right-0 bg-orange-500 p-2 rounded-full cursor-pointer shadow-lg hover:bg-orange-600 transition-colors"
+              >
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </label>
+              <input
+                id="profile-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+                className="hidden"
+              />
+            </motion.div>
+          </div>
+
+          <form onSubmit={handleProfileUpdate} className="space-y-6">
             <div>
-              <label className="block mb-1">Name:</label>
+              <label className="block text-sm font-medium mb-2">Name</label>
               <input
                 type="text"
                 value={profileInfo.name}
-                onChange={(e) =>
-                  setProfileInfo({ ...profileInfo, name: e.target.value })
-                }
-                className="w-full p-2 border rounded text-black"
+                onChange={(e) => setProfileInfo({ ...profileInfo, name: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-black"
                 placeholder="Your name"
               />
             </div>
             <div>
-              <label className="block mb-1">Bio:</label>
+              <label className="block text-sm font-medium mb-2">Bio</label>
               <textarea
                 value={profileInfo.bio}
-                onChange={(e) =>
-                  setProfileInfo({ ...profileInfo, bio: e.target.value })
-                }
-                className="w-full p-2 border rounded text-black"
-                rows={3}
-                placeholder="Your bio"
+                onChange={(e) => setProfileInfo({ ...profileInfo, bio: e.target.value })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-black"
+                rows={4}
+                placeholder="Tell us about yourself"
               />
-            </div>
-            <div>
-              <label className="block mb-1">Profile Picture:</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePictureChange}
-                className="w-full"
-              />
-              {profileInfo.profilePicture && (
-                <img
-                  src={profileInfo.profilePicture}
-                  alt="Profile Preview"
-                  className="mt-2 w-32 h-32 rounded-full object-cover"
-                />
-              )}
             </div>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              className="bg-orange-500 text-white px-4 py-2 rounded"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200"
             >
-              Update Profile
+              Save Changes
             </motion.button>
           </form>
-        </div>
+        </motion.div>
 
-        {/* Meme Listings Section */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Your Memes</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {userMemes.length > 0 ? (
-              userMemes.map((meme) => (
-                <Link key={meme.id} href={`/meme/${meme.id}`}>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
-                  >
-                    <img
-                      src={meme.url || "/placeholder.svg"}
-                      alt={meme.title}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="font-bold text-lg">{meme.title}</h3>
-                    </div>
-                  </motion.div>
-                </Link>
-              ))
-            ) : (
-              <p>No memes uploaded yet.</p>
-            )}
-          </div>
-
-          <h2 className="text-2xl font-bold my-4">Liked Memes</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {likedMemes.length > 0 ? (
-              likedMemes.map((memeId) => {
-                const likedMeme = memes.find((m) => m.id === memeId);
-                if (!likedMeme) return null;
-                return (
-                  <Link key={likedMeme.id} href={`/meme/${likedMeme.id}`}>
+        {/* Enhanced Meme Listings Section */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="space-y-8"
+        >
+          <div>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Your Memes</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {userMemes.length > 0 ? (
+                userMemes.map((meme) => (
+                  <Link key={meme.id} href={`/meme/${meme.id}`}>
                     <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg"
+                      whileHover={{ scale: 1.03, y: -5 }}
+                      transition={{ duration: 0.2 }}
+                      className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200"
                     >
                       <img
-                        src={likedMeme.url || "/placeholder.svg"}
-                        alt={likedMeme.title}
-                        className="w-full h-40 object-cover"
+                        src={meme.url || "/placeholder.svg"}
+                        alt={meme.title}
+                        className="w-full h-48 object-cover"
                       />
                       <div className="p-4">
-                        <h3 className="font-bold text-lg">{likedMeme.title}</h3>
+                        <h3 className="font-bold text-lg text-gray-800 dark:text-white">{meme.title}</h3>
                       </div>
                     </motion.div>
                   </Link>
-                );
-              })
-            ) : (
-              <p>No liked memes yet.</p>
-            )}
+                ))
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No memes uploaded yet.</p>
+              )}
+            </div>
           </div>
-        </div>
+
+          <div>
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Liked Memes</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {likedMemes.length > 0 ? (
+                likedMemes.map((memeId) => {
+                  const likedMeme = memes.find((m) => m.id === memeId);
+                  if (!likedMeme) return null;
+                  return (
+                    <Link key={likedMeme.id} href={`/meme/${likedMeme.id}`}>
+                      <motion.div
+                        whileHover={{ scale: 1.03, y: -5 }}
+                        transition={{ duration: 0.2 }}
+                        className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200"
+                      >
+                        <img
+                          src={likedMeme.url || "/placeholder.svg"}
+                          alt={likedMeme.title}
+                          className="w-full h-48 object-cover"
+                        />
+                        <div className="p-4">
+                          <h3 className="font-bold text-lg text-gray-800 dark:text-white">{likedMeme.title}</h3>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  );
+                })
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No liked memes yet.</p>
+              )}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </motion.div>
   );
